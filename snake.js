@@ -7,6 +7,7 @@ $(function() {
 	canvas.height = height;
 
 	// Game state variables.
+	var breakfast = new Audio('breakfast.m4a');
 	var cw = 10; // Cell width.
 	var direction; // Direction of snake.
 	var food;
@@ -58,6 +59,7 @@ $(function() {
 		if (nextX === food.x && nextY === food.y) {
 			var tail = {x: nextX, y: nextY};
 			score++;
+			breakfast.play();
 			makeFood();
 		} else {
 			var tail = snakeArray.pop();
@@ -69,7 +71,7 @@ $(function() {
 		snakeArray.unshift(tail);
 
 		// Game over.
-		if (nextX < 0 || nextX >= (canvas.width / cw) || (nextY - 1) < 0 || (nextY - 1) >= (canvas.height / cw)) {
+		if (nextX < 0 || nextX >= (canvas.width / cw) || (nextY) < 0 || (nextY - 1) >= (canvas.height / cw)) {
 			alert('You ate ' + score + ' breakfasts!');
 			initialise();
 			return;
@@ -98,10 +100,10 @@ $(function() {
 
 	$(document).keydown(function(e) {
 		var key = e.which;
-		if (key === 37 && direction !== "right") direction = "left";
-		if (key === 38 && direction !== "down") direction = "up";
-		if (key === 39 && direction !== "left") direction = "right";
-		if (key === 40 && direction !== "up") direction = "down";
+		if (key === 37 && direction !== "right") { direction = "left"; }
+		if (key === 38 && direction !== "down") { direction = "up"; }
+		if (key === 39 && direction !== "left") { direction = "right"; }
+		if (key === 40 && direction !== "up") { direction = "down"; }
 	});
 
 });
