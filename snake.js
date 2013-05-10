@@ -36,7 +36,7 @@ $(function() {
 	var paintCell = function(x, y, head) {
 		var head = head || false;
 		context.fillStyle = 'turquoise';
-		if (head) {context.fillStyle = 'green';}
+		if (head) {context.fillStyle = 'red';
 		context.fillRect(x * cw, y * cw, cw, cw);
 	};
 
@@ -53,7 +53,7 @@ $(function() {
 		if (direction === "down") nextY++;
 
 		// If eaten food, add another block to snake, otherwise move as normal.
-		if (nextX == food.x && nextY == food.y) {
+		if (nextX === food.x && nextY === food.y) {
 			var tail = {x: nextX, y: nextY};
 			score++;
 			makeFood();
