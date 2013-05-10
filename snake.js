@@ -15,7 +15,7 @@ $(function() {
 
 	var snakeArray; // Array of cells which make the snake.
 
-	// Initialises a snake
+	// Initialises a snake.
 	var makeSnake = function() {
 		var snakeLength = 7;
 		snakeArray = [];
@@ -36,21 +36,23 @@ $(function() {
 	var paintCell = function(x, y, head) {
 		var head = head || false;
 		context.fillStyle = 'turquoise';
-		if (head) {context.fillStyle = 'red';
+		if (head) {context.fillStyle = 'red';}
 		context.fillRect(x * cw, y * cw, cw, cw);
 	};
 
 	var render = function() {
-		// Renders game board
+		// Renders game board.
 		context.fillStyle = 'black';
 		context.fillRect(0, 0, width, height);
 
+		// Current x and y of snakes head.
 		var nextX = snakeArray[0].x;
 		var nextY = snakeArray[0].y;
-		if (direction === "right") nextX++;
-		if (direction === "left") nextX--;
-		if (direction === "up") nextY--;
-		if (direction === "down") nextY++;
+		// Depending on direction, increment next position to correct value.
+		if (direction === "right")  { nextX++; }
+		if (direction === "left") 	{ nextX--; }
+		if (direction === "up")     { nextY--; }
+		if (direction === "down")   { nextY++; }
 
 		// If eaten food, add another block to snake, otherwise move as normal.
 		if (nextX === food.x && nextY === food.y) {
@@ -67,7 +69,7 @@ $(function() {
 		snakeArray.unshift(tail);
 
 		// Game over.
-		if (nextX < 0 || nextX >= (canvas.width / cw) || nextY < 0 || nextY >= (canvas.height / cw)) {
+		if (nextX < 0 || nextX >= (canvas.width / cw) || (nextY - 1) < 0 || (nextY - 1) >= (canvas.height / cw)) {
 			alert('You ate ' + score + ' breakfasts!');
 			initialise();
 			return;
@@ -88,8 +90,8 @@ $(function() {
 		score = 0;
 
 		// Kicks off game loop.
-		if (typeof gameLoop != "undefined") {clearInterval(gameLoop);}
-		gameLoop = setInterval(render, 60);
+		if (gameLoop && gameLoop.constructor) { clearInterval(gameLoop); }
+		gameLoop = setInterval(render, 30);
 	};
 
 	initialise();
