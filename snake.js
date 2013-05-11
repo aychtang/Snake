@@ -29,8 +29,8 @@ $(function() {
 	// Places food at random position within game bounds.
 	var makeFood = function() {
 		food = {
-			x : ~~(Math.random() * (width - cw) / cw),
-			y : ~~(Math.random() * (height - cw) / cw)
+			x : ~~ (Math.random() * (width - cw) / cw),
+			y : ~~ (Math.random() * (height - cw) / cw)
 		};
 	};
 
@@ -50,10 +50,10 @@ $(function() {
 		var nextX = snakeArray[0].x;
 		var nextY = snakeArray[0].y;
 		// Depending on direction, increment next position to correct value.
-		if (direction === "right")  { nextX++; }
-		if (direction === "left") 	{ nextX--; }
-		if (direction === "up")     { nextY--; }
-		if (direction === "down")   { nextY++; }
+		if (direction === "right")  { nextX++; };
+		if (direction === "left") 	{ nextX--; };
+		if (direction === "up")     { nextY--; };
+		if (direction === "down")   { nextY++; };
 
 		// If eaten food, add another block to snake, otherwise move as normal.
 		if (nextX === food.x && nextY === food.y) {
@@ -77,8 +77,9 @@ $(function() {
 			return;
 		}
 
+		// Renders the entire snake, last argument checks if it is the head section.
 		for (var i = 0; i < snakeArray.length; i++) {
-			paintCell(snakeArray[i].x, snakeArray[i].y, snakeArray[i] === snakeArray[0]);
+			paintCell(snakeArray[i].x, snakeArray[i].y, i === 0);
 		}
 
 		paintCell(food.x, food.y);
@@ -94,6 +95,7 @@ $(function() {
 		// Kicks off game loop.
 		if (gameLoop && gameLoop.constructor) { clearInterval(gameLoop); }
 		gameLoop = setInterval(render, 30);
+		return;
 	};
 
 	initialise();
