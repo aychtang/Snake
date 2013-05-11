@@ -1,111 +1,105 @@
-$(function() {
-	var canvas = $("#canvas")[0];
-	var context = canvas.getContext("2d");
-	var width = document.width - 25;
-	var height = document.height - 25;
-	canvas.width = width;
-	canvas.height = height;
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
 
-	// Game state variables.
-	var breakfast = new Audio('breakfast.m4a');
-	var cw = 10; // Cell width.
-	var direction; // Direction of snake.
-	var food;
-	var score;
-	var gameLoop;
+var size = 500; // Canvas size of square in px.
+var gridSize = 10; // Size of each square in grid system.
+canvas.width = canvas.height = size;
+var snake;
+var food;
+var gameLoop;
+var direction;
 
-	var snakeArray; // Array of cells which make the snake.
+var makeSnake = function(length) {
+	var snake = []; // Array that simulates snake.
 
-	// Initialises a snake.
-	var makeSnake = function() {
-		var snakeLength = 7;
-		snakeArray = [];
+	// Add a block to the snake until it matches the length.
+	for (var i = length; i > 0; i--) {
+		snake.push({x: i, y : 0});
+	}
 
-		for (var i = 0; i < snakeLength; i++) {
-			snakeArray.push({x: i, y: 0});
-		}
+	return snake;
+};
+
+// Returns new food object at random position within gameBoard.
+var makeFood = function() {
+	return {
+		x: ~~(Math.random() * (size - gridSize) / gridSize),
+		y: ~~(Math.random() * (size - gridSize) / gridSize)
 	};
+};
 
-	// Places food at random position within game bounds.
-	var makeFood = function() {
-		food = {
-			x : ~~ (Math.random() * (width - cw) / cw),
-			y : ~~ (Math.random() * (height - cw) / cw)
-		};
-	};
+// Renders board.
+var drawBoard = function(boardSize) {
+	context.fillStyle = "pink";
+	context.fillRect(0, 0, boardSize, boardSize);
+};
 
-	var paintCell = function(x, y, head) {
-		var head = head || false;
-		context.fillStyle = 'turquoise';
-		if (head) {context.fillStyle = 'red';}
-		context.fillRect(x * cw, y * cw, cw, cw);
-	};
+// Draws cell at grid coord passed in.
+var drawCell = function(x, y) {
+	context.fillStyle = 'blue';
+	context.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+};
 
-	var render = function() {
-		// Renders game board.
-		context.fillStyle = 'black';
-		context.fillRect(0, 0, width, height);
+var drawSnake = function() {
+	for (var i = snake.length - 1; i > 0; i--) {
+		drawCell(snake[i].x, snake[i].y);
+	}
+};
 
-		// Current x and y of snakes head.
-		var nextX = snakeArray[0].x;
-		var nextY = snakeArray[0].y;
-		// Depending on direction, increment next position to correct value.
-		if (direction === "right")  { nextX++; };
-		if (direction === "left") 	{ nextX--; };
-		if (direction === "up")     { nextY--; };
-		if (direction === "down")   { nextY++; };
+var move = function () {
+	var nextX = snake[0].x;
+	var nextY = snake[0].y;
 
-		// If eaten food, add another block to snake, otherwise move as normal.
-		if (nextX === food.x && nextY === food.y) {
-			var tail = {x: nextX, y: nextY};
-			score++;
-			breakfast.play();
-			makeFood();
-		} else {
-			var tail = snakeArray.pop();
-			tail.x = nextX; 
-			tail.y = nextY;
-		}
+	if (direction === 'right') nextX++;
+	if (direction === "left")	{ nextX--; };
+	if (direction === "up")   	{ nextY--; };
+	if (direction === "down") 	{ nextY++; };
 
-		// Put tail to front.
-		snakeArray.unshift(tail);
-
-		// Game over.
-		if (nextX < 0 || nextX >= (canvas.width / cw) || (nextY) < 0 || (nextY - 1) >= (canvas.height / cw)) {
-			alert('You ate ' + score + ' breakfasts!');
-			initialise();
-			return;
-		}
-
-		// Renders the entire snake, last argument checks if it is the head section.
-		for (var i = 0; i < snakeArray.length; i++) {
-			paintCell(snakeArray[i].x, snakeArray[i].y, i === 0);
-		}
-
-		paintCell(food.x, food.y);
-	};
-
-	// Sets initial direction + score, creates first snake + food.
-	var initialise = function() {
-		direction = 'right';
-		makeSnake();
+	// Moving and eating logic.
+	if (nextX === food.x && nextY === food.y) {
+		var tail = {x: nextX, y: nextY};
 		makeFood();
-		score = 0;
+	} else {
+		var tail = snake.pop();
+		tail.x = nextX;
+		tail.y = nextY;
+	}
 
-		// Kicks off game loop.
-		if (gameLoop && gameLoop.constructor) { clearInterval(gameLoop); }
-		gameLoop = setInterval(render, 30);
+	// Gameover.
+	if (nextX < 0 || nextX > (size / gridSize) || nextY < 0 || nextY > (size / gridSize)) {
+		initialise();
 		return;
-	};
+	}
 
-	initialise();
+	snake.unshift(tail); // Pop tail from end and put to front.
+};
 
-	$(document).keydown(function(e) {
-		var key = e.which;
-		if (key === 37 && direction !== "right") { direction = "left"; }
-		if (key === 38 && direction !== "down") { direction = "up"; }
-		if (key === 39 && direction !== "left") { direction = "right"; }
-		if (key === 40 && direction !== "up") { direction = "down"; }
-	});
+// Main gameloop.
+var main = function() {
+	drawBoard(size);
+	drawCell(food.x, food.y);
+	move();
+	drawSnake();
+};
 
+// Initialise snake and food, and kick off gameloop.
+var initialise = function() {
+	direction = 'right';
+	drawBoard(size);
+	snake = makeSnake(7);
+	food = makeFood();
+
+	// Handles gameloop ignition.
+	if (gameLoop && gameLoop.constructor) {clearInterval(gameLoop);}
+	gameLoop = setInterval(main, 18);
+};
+
+initialise();
+
+$(document).keydown(function(e) {
+	var key = e.which;
+	if (key === 37 && direction !== "right") { direction = "left"; }
+	if (key === 38 && direction !== "down") { direction = "up"; }
+	if (key === 39 && direction !== "left") { direction = "right"; }
+	if (key === 40 && direction !== "up") { direction = "down"; }
 });
